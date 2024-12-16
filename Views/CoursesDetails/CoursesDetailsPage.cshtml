@@ -1,0 +1,271 @@
+﻿@{
+    ViewData["Title"] = "Course Details";
+    Layout = "_DevExtremeLayout";
+}
+
+<div class="page-title">
+    <h1>
+        <i class="fas fa-info-circle"></i>
+        Course Details
+    </h1>
+</div>
+
+<div id="gridContainer"></div>
+
+<script>
+    $(function () {
+        $("#gridContainer").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "coursesdetails_ID",
+                loadUrl: "/CoursesDetails/LoadCourseDetails",
+                insertUrl: "/CoursesDetails/AddCourseDetail",
+                updateUrl: "/CoursesDetails/UpdateCourseDetail",
+                deleteUrl: "/CoursesDetails/DeleteCourseDetail"
+            }),
+            keyExpr: "coursesdetails_ID",
+            selection: {
+                mode: "multiple"
+            },
+            export: {
+                enabled: true,
+                allowExportSelectedData: true
+            },
+            onExporting: exporting,
+            allowColumnResizing: true,
+            columnAutoWidth: true,
+            editing: {
+                mode: "popup",
+                allowAdding: true,
+                allowUpdating: true,
+                allowDeleting: true,
+                popup: {
+                    showTitle: true,
+                    title: "Course Detail",
+                    resizeEnabled: true,
+                    width: 800
+                }
+            },
+            rtlEnabled: true,
+            searchPanel: {
+                visible: true,
+                highlightCaseSensitive: true
+            },
+            groupPanel: {
+                visible: false
+            },
+            rowAlternationEnabled: true,
+            width: "100%",
+            height: 600,
+            scrolling: {
+                mode: "standard",
+                useNative: false
+            },
+            paging: {
+                pageSize: 100
+            },
+            showBorders: true,
+            showColumnLines: true,
+            columns: [
+                {
+                    dataField: "coursesdetails_ID",
+                    caption: "Detail ID",
+                    allowEditing: false,
+                },
+                {
+                    dataField: "coursesdetails_courses_ID",
+                    caption: "Course ID",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "courses_ID",
+                            loadUrl: "/Courses/LoadCourses"
+                        }),
+                        valueExpr: "courses_ID",
+                        displayExpr: "courses_Name",
+                        showClearButton: true
+                    }
+                },
+                {
+                    dataField: "coursesdetails_semesters_ID",
+                    caption: "Semester",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "semesters_ID",
+                            loadUrl: "/Semesters/LoadSemesters"
+                        }),
+                        valueExpr: "semesters_ID",
+                        displayExpr: "semesters_Name",
+                        showClearButton: true
+                    }
+                },
+                {
+                    dataField: "coursesdetails_departments_ID",
+                    caption: "Department",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "departments_ID",
+                            loadUrl: "/Departments/LoadDepartments"
+                        }),
+                        valueExpr: "departments_ID",
+                        displayExpr: "departments_Name",
+                        showClearButton: true
+                    }
+                },
+                {
+                    dataField: "CoursesDetails_years_ID",
+                    caption: "Year",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "Years_ID",
+                            loadUrl: "/Years/LoadYears"
+                        }),
+                        valueExpr: "Years_ID",
+                        displayExpr: "Years_Name",
+                        showClearButton: true
+                    }
+                },
+                {
+                    dataField: "CoursesDetails_days_ID",
+                    caption: "Day",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "days_ID",
+                            loadUrl: "/Days/LoadDays"
+                        }),
+                        valueExpr: "days_ID",
+                        displayExpr: "days_Name",
+                        showClearButton: true
+                    }
+                },
+                {
+                    dataField: "CoursesDetails_rooms_ID",
+                    caption: "Room",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "rooms_ID",
+                            loadUrl: "/Rooms/LoadRooms"
+                        }),
+                        valueExpr: "rooms_ID",
+                        displayExpr: "room_Name",
+                        showClearButton: true
+                    }
+                },
+                {
+                    dataField: "coursesdetails_periods_ID",
+                    caption: "Period",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "periods_ID",
+                            loadUrl: "/Periods/LoadPeriods"
+                        }),
+                        valueExpr: "periods_ID",
+                        displayExpr: "periods_Name",
+                        showClearButton: true
+                    }
+                },
+                {
+                    dataField: "coursesdetails_IsEnd",
+                    caption: "Is Ended",
+                    dataType: "boolean"
+                },
+                {
+                    dataField: "coursesdetails_professors_ID",
+                    caption: "Professor",
+                    lookup: {
+                        dataSource: DevExpress.data.AspNet.createStore({
+                            key: "professors_ID",
+                            loadUrl: "/Professors/LoadProfessors"
+                        }),
+                        valueExpr: "professors_ID",
+                        displayExpr: "professors_Name",
+                        showClearButton: true
+                    }
+                }
+            ],
+            columnFixing: {
+                enabled: true
+            },
+            headerFilter: {
+                visible: true
+            },
+            summary: {
+                totalItems: [
+                    {
+                        column: "coursesdetails_ID",
+                        summaryType: "count",
+                        displayFormat: "Total Details: {0}"
+                    }
+                ]
+            },
+            onContextMenuPreparing: onContextMenuPreparing
+        });
+
+        function exporting(e) {
+            var workbook = new ExcelJS.Workbook();
+            var worksheet = workbook.addWorksheet('Course Details');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet: worksheet,
+                autoFilterEnabled: true
+            }).then(function () {
+                workbook.xlsx.writeBuffer().then(function (buffer) {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'CourseDetails.xlsx');
+                });
+            });
+        }
+
+        function onContextMenuPreparing(e) {
+            if (e.row && e.row.rowType === "totalFooter") {
+                e.items = e.items || [];
+
+                e.items.push(
+                    {
+                        text: "Sum",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "sum");
+                        }
+                    },
+                    {
+                        text: "Count",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "count");
+                        }
+                    },
+                    {
+                        text: "Min",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "min");
+                        }
+                    },
+                    {
+                        text: "Max",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "max");
+                        }
+                    }
+                );
+            }
+        }
+
+        function setSummaryType(column, summaryType) {
+            var dataGrid = $("#gridContainer").dxDataGrid("instance");
+
+            var summaryItems = dataGrid.option("summary.totalItems") || [];
+            var summaryExists = false;
+
+            summaryItems.forEach(function (item) {
+                if (item.column === column) {
+                    item.summaryType = summaryType;
+                    summaryExists = true;
+                }
+            });
+
+            if (!summaryExists) {
+                summaryItems.push({ column: column, summaryType: summaryType });
+            }
+
+            dataGrid.option("summary.totalItems", summaryItems);
+            dataGrid.refresh();
+        }
+    });
+</script>

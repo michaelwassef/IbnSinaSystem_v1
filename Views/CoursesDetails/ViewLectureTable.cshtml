@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "Lecture Table";
+    Layout = "_StudentDevExtremeLayout";
+}
+
+<div class="page-title text-center">
+    <h1>
+        <i class="fas fa-table text-primary"></i> Lecture Table
+    </h1>
+</div>
+
+<div class="lecture-grid-container">
+    <table id="lectureTable" class="lecture-table">
+        <thead>
+            <tr>
+                <th>Day/Period</th>
+                @for (var i = 1; i <= 7; i++)
+                {
+                    <th>Period @i</th>
+                }
+            </tr>
+        </thead>
+        <tbody id="lectureTableBody">
+            <!-- Dynamic content will be appended here -->
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/CoursesDetails/LoadLectureGrid',
+                type: 'GET',
+                success: function (gridData) {
+                    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                    const periods = ["Period 1", "Period 2", "Period 3", "Period 4", "Period 5", "Period 6", "Period 7"];
+                    const tableBody = $('#lectureTableBody');
+
+                    days.forEach(day => {
+                        let row = `<tr><td class="day-column">${day}</td>`;
+
+                        periods.forEach(period => {
+                            const lecture = gridData.find(
+                                item => item.DayName === day && item.PeriodName === period
+                            );
+
+                            if (lecture) {
+                                row += `
+                                    <td class="lecture-cell">
+                                        <strong>${lecture.CourseName}</strong><br>
+                                        <small>${lecture.ProfessorName}</small><br>
+                                        <em>${lecture.RoomName}</em>
+                                    </td>
+                                `;
+                            } else {
+                                row += `<td class="lecture-cell empty-cell">-</td>`;
+                            }
+                        });
+
+                        row += '</tr>';
+                        tableBody.append(row);
+                    });
+                },
+                error: function () {
+                    DevExpress.ui.notify("Failed to load lecture table. Please try again.", "error", 3000);
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    /* General Styles */
+    .lecture-grid-container {
+        padding: 15px;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .lecture-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+        .lecture-table th,
+        .lecture-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .lecture-table th {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .lecture-table .day-column {
+            font-weight: bold;
+            background: #f8f9fa;
+        }
+
+    .lecture-cell {
+        font-size: 14px;
+        color: #333;
+    }
+
+        .lecture-cell.empty-cell {
+            color: #aaa;
+        }
+
+        .lecture-cell strong {
+            color: #007bff;
+        }
+
+        .lecture-cell small {
+            color: #555;
+        }
+
+        .lecture-cell em {
+            color: #888;
+        }
+
+    @@media (max-width: 768px) {
+        .lecture-table th, .lecture-table td
+
+    {
+        font-size: 12px;
+        padding: 5px;
+    }
+
+    }
+</style>

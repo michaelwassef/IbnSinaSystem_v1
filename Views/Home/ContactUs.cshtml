@@ -1,0 +1,145 @@
+﻿@{
+    ViewData["Title"] = "Contact Us";
+    Layout = "_StudentDevExtremeLayout";
+}
+
+<div class="page-title text-center">
+    <h1>
+        <i class="fas fa-envelope text-primary"></i> Contact Us
+    </h1>
+</div>
+
+<div class="contact-container">
+    <form id="contactForm" method="post">
+        <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="Name" class="form-control" placeholder="Enter your name" required />
+        </div>
+
+        <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="Email" class="form-control" placeholder="Enter your email" required />
+        </div>
+
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="Subject" class="form-control" placeholder="Enter subject" required />
+        </div>
+
+        <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="Message" class="form-control" rows="5" placeholder="Type your message here..." required></textarea>
+        </div>
+
+        <div class="form-actions text-center">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#contactForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: '/Students/SubmitContactForm',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        DevExpress.ui.notify(response.Message, "success", 3000);
+                        $('#contactForm')[0].reset();
+                    },
+                    error: function (xhr) {
+                        DevExpress.ui.notify(xhr.responseJSON?.ErrorMessage || 'An error occurred. Please try again.', "error", 3000);
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    /* Page Title */
+    .page-title {
+        margin-bottom: 20px;
+    }
+
+    /* Contact Container */
+    .contact-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+        .form-control:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+    /* Submit Button */
+    .form-actions {
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        color: white;
+        border: none;
+        transition: background 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: #0056b3;
+    }
+
+    @@media (max-width: 768px) {
+        .contact-container
+
+    {
+        padding: 15px;
+    }
+
+    .btn {
+        font-size: 14px;
+    }
+
+    }
+</style>

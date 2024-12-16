@@ -1,0 +1,71 @@
+﻿@model IbnSinaSystem.Models.LoginsModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IbnSina</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.8.95/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <main class="d-flex align-items-center min-vh-100 py-3 py-md-0">
+        <div class="container">
+            <div class="card login-card">
+                <div class="row no-gutters">
+                    <div class="col-md-6">
+                        <img src="/logo3.jpg" alt="login" class="login-card-img">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <p class="login-card-description" style="font-size:30px;">تسجيل الدخول</p>
+                            <form asp-controller="Access" asp-action="Login" method="post">
+                                <div class="form-group">
+                                    <i class="mdi mdi-account form-icon"></i>
+                                    <input type="text" class="form-control" name="UserName" asp-for="UserName" placeholder="اسم الدخول" required>
+                                </div>
+                                <div class="form-group">
+                                    <i class="mdi mdi-lock form-icon"></i>
+                                    <input type="password" class="form-control" name="Password" asp-for="Password" placeholder="كلمة المرور" required>
+                                </div>
+                                <div class="text-center">
+                                    <button class="btn btn-block login-btn mb-4" type="submit">دخول</button>
+                                </div>
+                                <div class="text-center">
+                                    <a href="/Access/SignUp" class="btn btn-link">تسجيل حساب جديد</a>
+                                </div>
+                            </form>
+                            @if (TempData["ValidateMessage"] != null)
+                            {
+                                <div class="alert alert-danger">
+                                    @TempData["ValidateMessage"]
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var validationMessage = document.querySelector(".alert");
+            if (validationMessage) {
+                setTimeout(function () {
+                    validationMessage.style.display = "none";
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

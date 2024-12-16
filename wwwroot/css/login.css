@@ -1,0 +1,154 @@
+body {
+    font-family: 'Cairo', sans-serif, Arial, Helvetica;
+    background: rgba(214, 216, 218, 1);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.login-card {
+    border: none;
+    box-shadow: 0 10px 30px rgba(172, 168, 168, 0.43);
+    overflow: hidden;
+    margin: auto;
+    width: 90%;
+    max-width: 2000px;
+    border-radius: 8px;
+}
+
+.login-card-img {
+    width: 100%;
+    object-fit: fill;
+    height: 100%;
+}
+
+.login-card .card-body {
+    padding: 7rem 1.5rem;
+}
+
+@media (max-width: 422px) {
+    .login-card .card-body {
+        padding: 1rem 0.5rem;
+    }
+}
+
+.login-card-description {
+    font-size: 1.5rem;
+    color: #000;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.login-card form {
+    max-width: 90%;
+    margin: auto;
+}
+
+.login-card .form-control {
+    border: 1px solid #d5dae2;
+    padding: 0.9rem 1.5rem;
+    margin-bottom: 1.2rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.login-card .form-control:focus {
+    border-color: #0056b3;
+    outline: none;
+}
+
+.login-card .login-btn {
+    padding: 0.75rem 1.2rem;
+    background-color: #020024;
+    border-radius: 4px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: #fff;
+    display: block;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.login-card .login-btn:hover {
+    border: 1px solid #000;
+    background-color: transparent;
+    color: #000;
+}
+
+.login-card-footer-text {
+    font-size: 1rem;
+    color: #0d2366;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 767px) {
+    .login-card-footer-text {
+        margin-bottom: 1rem;
+    }
+}
+
+.login-card-footer-nav a {
+    font-size: 0.875rem;
+    color: #919aa3;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.login-card .form-control:hover,
+.login-card .form-control:focus {
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.login-card .form-control::placeholder {
+    color: #919aa3;
+}
+.alert {
+    margin-top: 20px;
+}
+
+.form-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-control {
+    padding-left: 40px;
+}
+
+.alert {
+    margin-top: 20px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: white;
+    background-color: #dc3545;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    animation: slideIn 0.5s ease, fadeOut 0.5s 4.5s ease forwards;
+    text-align: center;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+}

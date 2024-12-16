@@ -1,0 +1,100 @@
+﻿@model IbnSinaSystem.Models.StudentsModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Sign Up</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.8.95/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <main class="d-flex align-items-center min-vh-100 py-3 py-md-0">
+        <div class="container">
+            <div class="card login-card">
+                <div class="row no-gutters">
+                    <div class="col-md-6">
+                        <img src="/photo2.jpg" alt="signup" class="login-card-img">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <p class="login-card-description" style="font-size:30px;">تسجيل طالب جديد</p>
+                            <form id="signupForm" method="post" action="/Access/SignUp">
+                                <div class="form-group">
+                                    <i class="mdi mdi-account form-icon"></i>
+                                    <input type="text" id="students_Name" name="students_Name" class="form-control" placeholder="الاسم الكامل" required />
+                                </div>
+                                <div class="form-group">
+                                    <i class="mdi mdi-phone form-icon"></i>
+                                    <input type="text" id="students_PhoneNumber" name="students_PhoneNumber" class="form-control" placeholder="رقم الهاتف" />
+                                </div>
+                                <div class="form-group">
+                                    <i class="mdi mdi-calendar form-icon"></i>
+                                    <input type="date" id="students_BirthDay" name="students_BirthDay" class="form-control" placeholder="تاريخ الميلاد" required />
+                                </div>
+                                <div class="form-group">
+                                    <i class="mdi mdi-domain form-icon"></i>
+                                    <select id="students_departments_ID" name="students_departments_ID" class="form-control" required>
+                                        <option value="">-- اختر القسم --</option>
+                                        @foreach (var department in ViewBag.Departments)
+                                        {
+                                            <option value="@department.departments_ID">@department.departments_Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <i class="mdi mdi-account-box form-icon"></i>
+                                    <input type="text" id="students_username" name="students_username" class="form-control" placeholder="اسم المستخدم" required />
+                                </div>
+                                <div class="form-group">
+                                    <i class="mdi mdi-lock form-icon"></i>
+                                    <input type="password" id="students_Password" name="students_Password" class="form-control" placeholder="كلمة المرور" required />
+                                </div>
+                                <div class="text-center">
+                                    <button class="btn btn-block login-btn mb-4" type="submit">تسجيل</button>
+                                </div>
+                                <div class="text-center">
+                                    <a href="/Access/Login" class="btn btn-link">لديك حساب بالفعل؟ تسجيل الدخول</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#signupForm").on("submit", function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: "/Access/SignUp",
+                    method: "POST",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        alert(response.SuccessMessage);
+                        if (response.success) {
+                            window.location.href = "/Access/Login";
+                        }
+                    },
+                    error: function (xhr) {
+                        const response = xhr.responseJSON;
+                        alert(response ? response.ErrorMessage : "An error occurred.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

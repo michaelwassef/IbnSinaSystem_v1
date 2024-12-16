@@ -1,0 +1,184 @@
+﻿@{
+    ViewData["Title"] = "Add Courses";
+    Layout = "_StudentDevExtremeLayout";
+}
+
+<div class="page-title text-center">
+    <h1>
+        <i class="fas fa-book-open text-primary"></i> Available Courses
+    </h1>
+</div>
+
+<div class="available-courses-container">
+    <div id="coursesGrid" class="courses-grid"></div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/CoursesDetails/LoadAvailableCourses',
+                type: 'GET',
+                success: function (courses) {
+                    const gridContainer = $('#coursesGrid');
+                    courses.forEach(course => {
+                        const courseCard = `
+                            <div class="course-card">
+                                <div class="course-header">
+                                    <h4 class="course-name">${course.courses_Name}</h4>
+                                    <span class="course-credits">${course.courses_Credit} Credits</span>
+                                </div>
+                                <div class="course-body">
+                                    <p><i class="fas fa-chalkboard-teacher"></i> <strong>Professor:</strong> ${course.professors_Name}</p>
+                                    <p><i class="fas fa-door-closed"></i> <strong>Room:</strong> ${course.room_Name}</p>
+                                    <p><i class="fas fa-clock"></i> <strong>Period:</strong> ${course.periods_Name}</p>
+                                    <p><i class="fas fa-calendar-day"></i> <strong>Day:</strong> ${course.days_Name}</p>
+                                </div>
+                                <div class="course-footer">
+                                    <button class="btn ${course.Is_Added === true ? 'btn-danger' : 'btn-success'} add-remove-btn"
+                                        data-id="${course.coursesdetails_ID}">
+                                        ${course.Is_Added === true ? 'Remove' : 'Add'}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        gridContainer.append(courseCard);
+                    });
+
+                    $('.add-remove-btn').on('click', function () {
+                        const courseId = $(this).data('id');
+
+                        if (!courseId || courseId <= 0) {
+                            DevExpress.ui.notify("Invalid course ID. Please try again.", "error", 3000);
+                            return;
+                        }
+
+                        const isAdding = $(this).hasClass('btn-success');
+                        const url = isAdding
+                            ? '/CoursesDetails/AddCourse'
+                            : '/CoursesDetails/RemoveCourse';
+
+                       $.ajax({
+                            url: url,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(courseId),
+                            success: function (response) {
+                                console.log("Payload sent to the server:", courseId);
+                                DevExpress.ui.notify(response.Message, "success", 3000);
+
+                                const button = $(`[data-id="${courseId}"]`);
+                                button.toggleClass('btn-success btn-danger');
+                                button.text(isAdding ? 'Remove' : 'Add');
+                            },
+                            error: function (xhr) {
+                                console.error("Error response:", xhr.responseText);
+                                DevExpress.ui.notify(xhr.responseJSON?.ErrorMessage || 'An error occurred.', "error", 3000);
+                            }
+                        });
+                    });
+                },
+                error: function () {
+                    DevExpress.ui.notify("Failed to load courses. Please try again.", "error", 3000);
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .page-title {
+        margin-bottom: 15px;
+    }
+
+    .available-courses-container {
+        padding: 15px;
+    }
+
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .course-card {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 260px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .course-header {
+        background: linear-gradient(145deg, #007bff, #0056b3);
+        color: #ffffff;
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+    }
+
+    .course-name {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .course-credits {
+        font-size: 12px;
+        font-style: italic;
+    }
+
+    .course-body {
+        padding: 10px;
+        color: #333;
+        flex-grow: 1;
+        font-size: 14px;
+    }
+
+    .course-body p {
+        margin: 6px 0;
+    }
+
+    .course-footer {
+        padding: 5px;
+        text-align: center;
+    }
+
+    .course-footer .btn {
+        padding: 6px 20px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: #ffffff;
+    }
+
+    .btn-success:hover {
+        background: #218838;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: #ffffff;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+</style>

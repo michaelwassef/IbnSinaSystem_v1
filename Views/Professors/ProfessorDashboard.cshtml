@@ -1,0 +1,278 @@
+﻿
+@{
+    ViewData["Title"] = "ProfessorDashboard";
+    Layout = "_ProfessorDevExtremeLayout";
+}
+
+<div class="page-title">
+    <h1>
+        <i class="fas fa-users"></i>
+        Professor Dashboard
+    </h1>
+</div>
+
+<div class="professor-profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="profile-icon">
+                <i class="fas fa-id-card-alt"></i>
+            </div>
+            <h2 class="profile-name" id="professorName"></h2>
+        </div>
+        <div class="profile-details">
+            <div class="detail-grid">
+                <div class="detail-card">
+                    <i class="fas fa-user mx-3"></i>
+                    <div class="detail-content">
+                        <p class="detail-label">Username</p>
+                        <p id="professorUsername" class="detail-value"></p>
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <i class="fas fa-phone mx-3"></i>
+                    <div class="detail-content">
+                        <p class="detail-label">Phone</p>
+                        <p id="professorPhone" class="detail-value"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="profile-footer">
+            <a href="/Professors/EditProfessorProfile" class="btn btn-primary btn-animate">
+                <i class="fas fa-user-edit mx-2"></i> Edit Profile
+            </a>
+            <a href="/CoursesDetails/ManageCourses" class="btn btn-info btn-animate">
+                <i class="fas fa-book mx-2"></i> Manage Courses
+            </a>
+            <a href="/CoursesExams/ManageExamsPage" class="btn btn-success btn-animate">
+                <i class="fas fa-chart-line mx-2"></i> Manage Exams
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("LoadProfessorprofile")',
+                method: 'GET',
+                success: function (data) {
+                    $('#professorName').text(data.professors_Name);
+                    $('#professorDepartment').text(data.professors_Department || 'N/A');
+                    $('#professorUsername').text(data.professors_UserName);
+                    $('#professorPhone').text(data.professors_PhoneNumber || 'N/A');
+                },
+                error: function () {
+                    alert('Error loading professor profile!');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .student-profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .profile-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        animation: fade-in 0.5s ease;
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-icon {
+        font-size: 40px;
+        color: #007bff;
+        margin-bottom: 10px;
+        animation: bounce 2s infinite;
+    }
+
+    .profile-name {
+        font-size: 26px;
+        font-weight: bold;
+        color: #333;
+        margin: 5px 0;
+        text-transform: capitalize;
+    }
+
+    .profile-department {
+        font-size: 16px;
+        color: #777;
+        font-style: italic;
+    }
+
+    .profile-details {
+        margin-top: 20px;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .detail-card {
+        display: flex;
+        align-items: center;
+        background: linear-gradient(145deg, #f0f0f0, #ffffff);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.5);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2), -4px -4px 12px rgba(255, 255, 255, 0.5);
+        }
+
+        .detail-card i {
+            font-size: 28px;
+            color: #007bff;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+    .detail-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-label {
+        font-size: 14px;
+        color: #555;
+        margin: 0;
+    }
+
+    .detail-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin: 0px 5px 0px 5px;
+    }
+
+    .profile-footer {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    @@keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .profile-footer {
+        text-align: center;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #ffffff;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+        .btn i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+    .btn-primary {
+        background: #007bff;
+    }
+
+        .btn-primary:hover {
+            background: #0056d6;
+            transform: translateY(-3px);
+        }
+
+    .btn-success {
+        background: #28a745;
+    }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-3px);
+        }
+
+    .btn-info {
+        background: #17a2b8;
+    }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-3px);
+        }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-3px);
+        }
+
+    .btn-animate {
+        position: relative;
+        overflow: hidden;
+    }
+
+        .btn-animate::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.3s ease;
+            z-index: 1;
+        }
+
+        .btn-animate:hover::after {
+            left: 0;
+        }
+
+</style>

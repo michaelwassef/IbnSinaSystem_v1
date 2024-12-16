@@ -1,0 +1,179 @@
+﻿@{
+    ViewData["Title"] = "Manage Exams";
+    Layout = "_ProfessorDevExtremeLayout";
+}
+
+<div class="page-title text-center mb-4">
+    <h1>
+        <i class="fas fa-digital-tachograph text-primary"></i> Manage Exams
+    </h1>
+</div>
+
+<div class="container">
+    <div class="custom-card shadow-lg p-4 mb-4 bg-white rounded">
+        <div class="row align-items-end">
+            <div class="col-md-4 mb-3">
+                <label for="courseDropdown" class="form-label"><i class="fas fa-book"></i> <strong>Choose Course:</strong></label>
+                <div id="courseDropdown"></div>
+            </div>
+            <div class="col-md-2 mb-3">
+                <button id="filterButton" class="btn btn-primary btn-block">
+                    <i class="fas fa-filter"></i> Load Exams
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="gridContainer" class="bg-light p-3 rounded shadow-sm"></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        populateDxSelectBox("/CoursesDetails/LoadProfessorCourses", "courseDropdown", "coursesdetails_ID", "courses_Name");
+
+        $('#filterButton').on('click', function () {
+            const selectedCourse = $('#courseDropdown').dxSelectBox('instance').option('value');
+
+            if (selectedCourse) {
+                refreshDataGrid(selectedCourse);
+            } else {
+                DevExpress.ui.notify("Please select a course first.", "error", 3000);
+            }
+        });
+    });
+
+    function refreshDataGrid(courseId) {
+        const dataSource = new DevExpress.data.CustomStore({
+            key: "coursesexamsdetails_ID",
+            load: () => $.getJSON(`/CoursesExams/LoadExamsByCourse?courseId=${courseId}`),
+            insert: (values) => {
+                values.coursesexamsdetails_coursesdetails_ID = courseId;
+                return $.ajax({
+                    url: "/CoursesExams/AddExam",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(values),
+                    success: function () {
+                        DevExpress.ui.notify("Exam added successfully!", "success", 2000);
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseJSON?.ErrorMessage || "An unexpected error occurred while adding the exam.";
+                        DevExpress.ui.notify(errorMessage, "error", 3000);
+                    }
+                });
+            },
+            update: (key, values) => {
+                values.coursesexamsdetails_ID = key;
+                return $.ajax({
+                    url: `/CoursesExams/UpdateExam`,
+                    method: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(values),
+                    success: function () {
+                        DevExpress.ui.notify("Exam updated successfully!", "success", 2000);
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseJSON?.ErrorMessage || "An unexpected error occurred while updating the exam.";
+                        DevExpress.ui.notify(errorMessage, "error", 3000);
+                    }
+                });
+            },
+            remove: (key) => {
+                return $.ajax({
+                    url: `/CoursesExams/DeleteExam`,
+                    method: "DELETE",
+                    contentType: "application/json",
+                    data: JSON.stringify({ coursesexamsdetails_ID: key }),
+                    success: function () {
+                        DevExpress.ui.notify("Exam deleted successfully!", "success", 2000);
+                    },
+                    error: function () {
+                        DevExpress.ui.notify("Error occurred while deleting the exam.", "error", 3000);
+                    }
+                });
+            }
+        });
+
+        $("#gridContainer").dxDataGrid({
+            dataSource: dataSource,
+            keyExpr: "coursesexamsdetails_ID",
+            allowColumnResizing: true,
+            columnAutoWidth: true,
+            editing: {
+                mode: "popup",
+                allowAdding: true,
+                allowUpdating: true,
+                allowDeleting: true,
+                popup: {
+                    title: "Exam Details",
+                    showTitle: true,
+                    width: 600,
+                    height: 400
+                },
+                form: {
+                    items: [
+                        { dataField: "coursesexamsdetails_Name", caption: "Exam Name", validationRules: [{ type: "required" }] },
+                        { dataField: "coursesexamsdetails_Date", caption: "Date", editorType: "dxDateBox", editorOptions: { type: "date" } },
+                        { dataField: "coursesexamsdetails_TotalMarks", caption: "Total Marks", editorType: "dxNumberBox" }
+                    ]
+                }
+            },
+            columns: [
+                { dataField: "coursesexamsdetails_Name", caption: "Exam Name" },
+                { dataField: "coursesexamsdetails_Date", caption: "Date", dataType: "datetime" },
+                { dataField: "coursesexamsdetails_TotalMarks", caption: "Total Marks", dataType: "number" },
+                  {
+                    caption: "Add Marks",
+                    alignment: "center",
+                    allowEditing: false,
+                    cellTemplate: function (container, options) {
+                        $("<div>")
+                            .append($("<button>")
+                                .addClass("btn btn-primary btn-sm")
+                                .text("Add Marks")
+                                .on("click", function () {
+                                    const coursesexamsdetails_ID = options.data.coursesexamsdetails_ID;
+                                    const url = `/CoursesExams/AddMarksForStudents?examId=${coursesexamsdetails_ID}`;
+                                    window.location.href = url;
+                                })
+                            )
+                            .appendTo(container);
+                    }
+                }
+            ],
+            rtlEnabled: true,
+            showBorders: true,
+            headerFilter: { visible: true },
+            searchPanel: { visible: true },
+            rowAlternationEnabled: true,
+            onRowInserted: () => DevExpress.ui.notify("Exam added successfully!", "success", 2000),
+            onRowUpdated: () => DevExpress.ui.notify("Exam updated successfully!", "success", 2000),
+            onRowRemoved: () => DevExpress.ui.notify("Exam deleted successfully!", "success", 2000)
+        });
+    }
+</script>
+<style>
+    .custom-card {
+        border: none;
+        background: linear-gradient(to right, #007bff, #0056b3);
+        color: #fff;
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+
+    .custom-card label {
+        font-weight: bold;
+        color: #f8f9fa;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #218838;
+    }
+</style>

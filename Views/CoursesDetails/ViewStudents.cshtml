@@ -1,0 +1,183 @@
+﻿@{
+    ViewData["Title"] = "View Students";
+    Layout = "_ProfessorDevExtremeLayout";
+    var courseId = ViewData["CourseId"];
+    var courseName = ViewData["CourseName"];
+}
+
+<div class="page-title">
+    <h1>
+        <i class="fas fa-users text-primary"></i> Students in Course
+    </h1>
+</div>
+<h4 class="course-info">
+    Course ID: <span class="course-id">@courseId</span> | Course Name: <span class="course-name">@courseName</span>
+</h4>
+
+<div class="students-container">
+    <table id="studentsTable" class="students-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Department</th>
+                <th>Semester</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const courseId = '@courseId';
+
+            if (!courseId) {
+                DevExpress.ui.notify("Invalid course ID.", "error", 3000);
+                return;
+            }
+
+            $.ajax({
+                url: `/CoursesDetails/ViewStudentsData?courseId=${courseId}`,
+                type: 'GET',
+                success: function (students) {
+                    const tableBody = $('#studentsTable tbody');
+
+                    if (students.length === 0) {
+                        tableBody.append("<tr><td colspan='6' class='no-students'>No students enrolled in this course.</td></tr>");
+                        return;
+                    }
+
+                    students.forEach((student, index) => {
+                        const studentRow = `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${student.students_ID}</td>
+                                <td>${student.students_Name}</td>
+                                <td>${student.students_PhoneNumber}</td>
+                                <td>${student.departments_Name}</td>
+                                <td>${student.students_SemesterIN}</td>
+                            </tr>
+                        `;
+                        tableBody.append(studentRow);
+                    });
+                },
+                error: function () {
+                    DevExpress.ui.notify("Failed to load students. Please try again.", "error", 3000);
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    h4.course-info {
+        background: #f8f9fa; 
+        border-left: 4px solid #007bff;
+        padding: 10px 15px; 
+        margin-top: 15px;
+        border-radius: 8px; 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+        display: inline-block;
+    }
+
+    h4.course-info .course-id,
+    h4.course-info .course-name {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    h4.course-info .course-id::before {
+        content: "\f02b";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        margin-right: 8px;
+        color: #007bff;
+    }
+
+    h4.course-info .course-name::before {
+        content: "\f5da"; 
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        margin-right: 8px;
+        color: #28a745;
+    }
+
+    .students-container {
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .students-table {
+        width: 100%;
+        border-collapse: collapse;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+        table-layout: fixed;
+    }
+
+    .students-table thead {
+        background: linear-gradient(145deg, #007bff, #0056b3);
+        color: #fff;
+        text-transform: uppercase;
+    }
+
+    .students-table th,
+    .students-table td {
+        padding: 12px 15px;
+        text-align: center;
+        border: 1px solid #ddd;
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis;
+    }
+
+    .students-table th {
+        font-weight: bold;
+        font-size: 15px;
+    }
+
+    .students-table td {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .students-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .students-table tr:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .students-table .no-students {
+        text-align: center;
+        color: #666;
+        font-size: 16px;
+        padding: 20px;
+    }
+
+    @@media (max-width: 768px) {
+        .students-table
+
+    {
+        font-size: 12px;
+    }
+
+    .students-table th,
+    .students-table td {
+        padding: 8px;
+    }
+
+    }
+</style>
+

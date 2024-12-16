@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Messages";
+    Layout = "_DevExtremeLayout";
+}
+
+<div class="page-title text-center">
+    <h1>
+        <i class="fas fa-envelope-open text-primary"></i> Messages
+    </h1>
+</div>
+
+<div class="messages-container">
+    <div id="messagesGrid" class="messages-grid"></div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Students/GetAllMessages',
+                type: 'GET',
+                success: function (messages) {
+                    const gridContainer = $('#messagesGrid');
+
+                    if (messages.length === 0) {
+                        gridContainer.html('<p class="no-messages">No messages found.</p>');
+                        return;
+                    }
+
+                    messages.forEach(msg => {
+                        const messageCard = `
+                            <div class="message-card">
+                                <div class="message-header">
+                                    <h4 class="message-subject">${msg.Subject}</h4>
+                                    <span class="message-date">${new Date(msg.SubmittedAt).toLocaleDateString()} ${new Date(msg.SubmittedAt).toLocaleTimeString()}</span>
+                                </div>
+                                <div class="message-body">
+                                    <p><strong>From:</strong> ${msg.Name} (${msg.Email})</p>
+                                    <p>${msg.Message}</p>
+                                </div>
+                            </div>
+                        `;
+                        gridContainer.append(messageCard);
+                    });
+                },
+                error: function () {
+                    DevExpress.ui.notify("Failed to load messages. Please try again.", "error", 3000);
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .messages-container {
+        padding: 15px;
+    }
+
+    .messages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .message-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+    }
+
+    .message-header {
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+
+    .message-subject {
+        margin: 0;
+        font-size: 16px;
+        color: #007bff;
+    }
+
+    .message-date {
+        display: block;
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+    }
+
+    .message-body p {
+        margin: 5px 0;
+        color: #333;
+    }
+
+    .no-messages {
+        text-align: center;
+        font-size: 18px;
+        color: #888;
+        margin-top: 20px;
+    }
+</style>

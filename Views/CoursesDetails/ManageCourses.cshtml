@@ -1,0 +1,137 @@
+﻿@{
+    ViewData["Title"] = "Manage Courses";
+    Layout = "_ProfessorDevExtremeLayout";
+}
+
+<div class="page-title text-center">
+    <h1>
+        <i class="fas fa-book text-primary"></i> Manage Courses
+    </h1>
+</div>
+
+<div class="courses-container">
+    <div id="coursesGrid" class="courses-grid"></div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/CoursesDetails/LoadProfessorCourses',
+                type: 'GET',
+                success: function (courses) {
+                    const gridContainer = $('#coursesGrid');
+                    courses.forEach(course => {
+                        const courseCard = `
+                            <div class="course-card">
+                                <div class="course-header">
+                                    <h4 class="course-name">${course.courses_Name}</h4>
+                                    <span class="course-credit">${course.courses_Credit} Credits</span>
+                                </div>
+                                <div class="course-body">
+                                    <p><i class="fas fa-user"></i> <strong>Professor:</strong> ${course.professors_Name}</p>
+                                    <p><i class="fas fa-door-open"></i> <strong>Room:</strong> ${course.room_Name}</p>
+                                    <p><i class="fas fa-calendar-day"></i> <strong>Day:</strong> ${course.days_Name}</p>
+                                    <p><i class="fas fa-clock"></i> <strong>Period:</strong> ${course.periods_Name}</p>
+                                </div>
+                                <div class="course-footer">
+                                    <button class="btn btn-info view-students-btn" data-id="${course.coursesdetails_ID}">
+                                        <i class="fas fa-users"></i> View Students
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        gridContainer.append(courseCard);
+                    });
+
+                    $('.view-students-btn').on('click', function () {
+                        const courseId = $(this).data('id');
+                        window.location.href = `/CoursesDetails/ViewStudents?courseId=${courseId}`;
+                    });
+                },
+                error: function () {
+                    DevExpress.ui.notify("Failed to load courses. Please try again.", "error", 3000);
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .courses-container {
+        padding: 15px;
+    }
+
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .course-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .course-header {
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+
+    .course-header h4 {
+        margin: 0;
+        font-size: 18px;
+        color: #007bff;
+    }
+
+    .course-credit {
+        font-size: 14px;
+        color: #555;
+    }
+
+    .course-body p {
+        margin: 5px 0;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .course-footer {
+        text-align: center;
+    }
+
+    .course-footer .btn {
+        margin: 5px;
+        padding: 6px 15px;
+        font-size: 14px;
+        border-radius: 5px;
+    }
+
+    .btn-info {
+        background: #17a2b8;
+        color: #fff;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: #fff;
+    }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #fff;
+    }
+</style>

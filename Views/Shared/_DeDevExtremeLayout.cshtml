@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html lang="ar-eg" dir="rtl">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>IbnSina System - @ViewData["Title"]</title>
+    <link href="~/icon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <script src="~/devExpressConfig.js" type="module"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.rtl.min.css" integrity="sha384-gXt9imSW0VcJVHezoNQsP+TNrjYXoGcrqBZJpry9zJt8PCQjobwmhMGaDHTASo9N" crossorigin="anonymous">
+
+    <link href="~/css/devextreme/bootstrap.css" rel="stylesheet" />
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <link href="~/css/devextreme/dx.fluent.blue.light.css" rel="stylesheet" />
+
+    <script src="~/js/devextreme/jquery.js"></script>
+    <script src="~/js/devextreme/bootstrap.js"></script>
+    <script src="~/js/devextreme/dx.all.js"></script>
+    <link rel="stylesheet" href="~/css/site.css">
+
+    @*excel*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.10.1/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script src="~/js/devextreme/aspnet/dx.aspnet.mvc.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.data.js"></script>
+</head>
+<body>
+    <div id="loadingOverlay" style="display: none;" class="loading-overlay">
+        <div class="loading-indicator">
+            <div class="spinner"></div>
+            <p id="loadingText">Loading...</p>
+        </div>
+    </div>
+    <div class="sidebar close">
+        <div class="logo-details">
+            <i class='bx bx-menu'></i>
+        </div>
+        <div class="logo-details">
+            <img src="~/logo.png" alt="IbnSina System" class="logo-img">
+            <span class="logo_name">IbnSina System</span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <div class="profile-details">
+                    <div class="profile-content">
+                        <img src="~/logo.png" alt="profileImg">
+                    </div>
+                    <div class="name-job">
+                        <div class="profile_name" id="profile_name"></div>
+                        <div class="job"></div>
+                    </div>
+                    <a href="/home/logout">
+                        <i class='bx bx-log-out'></i>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <section class="home-section">
+        <div class="home-content">
+            <main class="container-fluid">
+                @RenderBody()
+            </main>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let arrow = document.querySelectorAll(".arrow");
+        for (var i = 0; i < arrow.length; i++) {
+            arrow[i].addEventListener("click", (e) => {
+                document.querySelectorAll(".sidebar .nav-links li.showMenu").forEach(item => {
+                    if (item !== e.target.parentElement.parentElement) {
+                        item.classList.remove("showMenu");
+                    }
+                });
+
+                let arrowParent = e.target.parentElement.parentElement;
+                arrowParent.classList.toggle("showMenu");
+            });
+        }
+
+        let sidebar = document.querySelector(".sidebar");
+        let sidebarBtn = document.querySelector(".bx-menu");
+
+        function adjustSidebarOnLoadOrResize() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove("open");
+                sidebar.classList.add("close");
+            } else {
+                sidebar.classList.remove("open");
+                sidebar.classList.add("close");
+            }
+        }
+
+        sidebarBtn.addEventListener("click", () => {
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains("close")) {
+                    sidebar.classList.remove("close");
+                    sidebar.classList.add("open");
+                } else {
+                    sidebar.classList.remove("open");
+                    sidebar.classList.add("close");
+                }
+            } else {
+                sidebar.classList.toggle("close");
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", adjustSidebarOnLoadOrResize);
+        window.addEventListener("resize", adjustSidebarOnLoadOrResize);
+
+        function displayLoading(show, message = "Loading...") {
+            if (show) {
+                $("#loadingText").text(message);
+                $("#loadingOverlay").show();
+            } else {
+                $("#loadingOverlay").hide();
+            }
+        }
+
+        function setSummaryType(column, summaryType) {
+            var dataGrid = $("#gridContainer").dxDataGrid("instance");
+
+            var scrollLeft = dataGrid.getScrollable().scrollLeft();
+            var contentReadyHandler = function () {
+                dataGrid.getScrollable().scrollTo({ left: scrollLeft });
+                dataGrid.off("contentReady", contentReadyHandler);
+            };
+            dataGrid.on("contentReady", contentReadyHandler);
+
+            var summaryItems = dataGrid.option("summary.totalItems") || [];
+            var summaryExists = false;
+
+            summaryItems.forEach(function (item) {
+                if (item.column === column) {
+                    item.summaryType = summaryType;
+                    summaryExists = true;
+                }
+            });
+
+            if (!summaryExists) {
+                summaryItems.push({ column: column, summaryType: summaryType });
+            }
+
+            dataGrid.option("summary.totalItems", summaryItems);
+            dataGrid.refresh();
+        } 
+
+        async function populateDxSelectBox(url, elementId, valueField, textField) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    const selectBoxElement = $(`#${elementId}`);
+
+                    selectBoxElement.dxSelectBox({
+                        dataSource: data,
+                        valueExpr: valueField,
+                        displayExpr: textField,
+                        placeholder: "برجاء الاختيار",
+                        showClearButton: true,
+                        searchEnabled: true,
+                    });
+                } else {
+                    console.error('Failed to load data for:', elementId);
+                }
+            } catch (error) {
+                console.error('Error fetching data for:', elementId, error);
+            }
+        }
+
+        async function populateDxTagBox(url, elementId, valueField, textField) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    const tagBoxElement = $(`#${elementId}`);
+
+                    if (tagBoxElement.data('dxTagBox')) {
+                        const tagBoxInstance = tagBoxElement.dxTagBox('instance');
+
+                        tagBoxInstance.option('value', []);
+
+                        tagBoxInstance.option('dataSource', data);
+                    } else {
+                        tagBoxElement.dxTagBox({
+                            dataSource: data,
+                            valueExpr: valueField,
+                            displayExpr: textField,
+                            showSelectionControls: true,
+                            searchEnabled: true,
+                            placeholder: "برجاء الاختيار",
+                            multiline: false,
+                            showClearButton: true,
+                            selectAllMode: "allPages",
+                        });
+                    }
+                } else {
+                    console.error('Failed to load data for:', elementId);
+                }
+            } catch (error) {
+                console.error('Error fetching data for: ', elementId, error);
+            }
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
+
+    <script src="https://kit.fontawesome.com/9838ff0bd8.js" crossorigin="anonymous"></script>
+</body>
+</html>

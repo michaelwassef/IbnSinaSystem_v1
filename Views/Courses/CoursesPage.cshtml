@@ -1,0 +1,171 @@
+﻿@{
+    ViewData["Title"] = "Courses";
+    Layout = "_DevExtremeLayout";
+}
+
+<div class="page-title">
+    <h1>
+        <i class="fas fa-book"></i>
+        Courses
+    </h1>
+</div>
+
+<div id="gridContainer"></div>
+
+<script>
+    $(function () {
+        $("#gridContainer").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "courses_ID",
+                loadUrl: "/Courses/LoadCourses",
+                insertUrl: "/Courses/AddCourse",
+                updateUrl: "/Courses/UpdateCourse",
+                deleteUrl: "/Courses/DeleteCourse"
+            }),
+            keyExpr: "courses_ID",
+            selection: {
+                mode: "multiple"
+            },
+            export: {
+                enabled: true,
+                allowExportSelectedData: true
+            },
+            onExporting: exporting,
+            allowColumnResizing: true,
+            columnAutoWidth: true,
+            editing: {
+                mode: "popup",
+                allowAdding: true,
+                allowUpdating: true,
+                allowDeleting: true,
+                popup: {
+                    showTitle: true,
+                    title: "Course Details",
+                    resizeEnabled: true,
+                    width: 700
+                }
+            },
+            rtlEnabled: true,
+            searchPanel: {
+                visible: true,
+                highlightCaseSensitive: true
+            },
+            groupPanel: {
+                visible: false
+            },
+            rowAlternationEnabled: true,
+            width: "100%",
+            height: 600,
+            scrolling: {
+                mode: "standard",
+                useNative: false
+            },
+            paging: {
+                pageSize: 100
+            },
+            showBorders: true,
+            showColumnLines: true,
+            columns: [
+                {
+                    dataField: "courses_ID",
+                    caption: "Course ID",
+                    allowEditing: false,
+                },
+                {
+                    dataField: "courses_Name",
+                    caption: "Course Name"
+                },
+                {
+                    dataField: "courses_Credit",
+                    caption: "Credits",
+                    dataType: "number"
+                }
+            ],
+            columnFixing: {
+                enabled: true
+            },
+            headerFilter: {
+                visible: true
+            },
+            summary: {
+                totalItems: [
+                    {
+                        column: "courses_ID",
+                        summaryType: "count",
+                        displayFormat: "Total Courses: {0}"
+                    }
+                ]
+            },
+            onContextMenuPreparing: onContextMenuPreparing
+        });
+
+        function exporting(e) {
+            var workbook = new ExcelJS.Workbook();
+            var worksheet = workbook.addWorksheet('Courses');
+
+            DevExpress.excelExporter.exportDataGrid({
+                component: e.component,
+                worksheet: worksheet,
+                autoFilterEnabled: true
+            }).then(function () {
+                workbook.xlsx.writeBuffer().then(function (buffer) {
+                    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'Courses.xlsx');
+                });
+            });
+        }
+
+        function onContextMenuPreparing(e) {
+            if (e.row && e.row.rowType === "totalFooter") {
+                e.items = e.items || [];
+
+                e.items.push(
+                    {
+                        text: "Sum",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "sum");
+                        }
+                    },
+                    {
+                        text: "Count",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "count");
+                        }
+                    },
+                    {
+                        text: "Min",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "min");
+                        }
+                    },
+                    {
+                        text: "Max",
+                        onItemClick: function () {
+                            setSummaryType(e.column.dataField, "max");
+                        }
+                    }
+                );
+            }
+        }
+
+        function setSummaryType(column, summaryType) {
+            var dataGrid = $("#gridContainer").dxDataGrid("instance");
+
+            var summaryItems = dataGrid.option("summary.totalItems") || [];
+            var summaryExists = false;
+
+            summaryItems.forEach(function (item) {
+                if (item.column === column) {
+                    item.summaryType = summaryType;
+                    summaryExists = true;
+                }
+            });
+
+            if (!summaryExists) {
+                summaryItems.push({ column: column, summaryType: summaryType });
+            }
+
+            dataGrid.option("summary.totalItems", summaryItems);
+            dataGrid.refresh();
+        }
+    });
+</script>

@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "AddMarksForStudents";
+    Layout = "_ProfessorDevExtremeLayout";
+    var CourseId = ViewData["CourseId"];
+    var Id = ViewData["Id"];
+    var Name = ViewData["Name"];
+    var Total = ViewData["Total"];
+}
+
+<div class="page-title">
+    <h1>
+        <i class="fas fa-users text-primary"></i>Add Marks For Students
+    </h1>
+</div>
+<div class="course-info-container">
+    <h4 class="course-info">
+        <span class="course-item"><i class="fas fa-id-card"></i> Course ID: <span>@CourseId</span></span>
+        <span class="course-item"><i class="fas fa-book"></i> Exam Name: <span>@Name</span></span>
+        <span class="course-item"><i class="fas fa-calculator"></i> Total: <span>@Total</span></span>
+    </h4>
+</div>
+
+<div id="gridContainer" class="mt-5"></div>
+
+<script>
+    $(function () {
+        const courseId = '@Id';
+
+        $("#gridContainer").dxDataGrid({
+            dataSource: new DevExpress.data.CustomStore({
+                key: "students_ID",
+                load: () => $.getJSON(`/CoursesExams/ViewStudentsData?courseId=${courseId}`),
+                update: (key, values) => {
+                },
+            }),
+            columns: [
+                { dataField: "students_ID", caption: "Student ID", allowEditing: false, },
+                { dataField: "students_Name", caption: "Student Name", allowEditing: false, },
+                {
+                    dataField: "MarksObtained",
+                    caption: "Marks",
+                    dataType: "number",
+                    validationRules: [
+                        { type: "required", message: "Marks are required." },
+                    ],
+                },
+            ],
+            editing: {
+                mode: "batch",
+                allowUpdating: true,
+            },
+            onSaving: function (e) {
+                const changes = e.changes.map(change => ({
+                    coursesexamsmarks_coursesexamsdetails_ID: courseId,
+                    coursesexamsdetails_students_ID: change.key,
+                    coursesexamsdetails_MarkOfStudent: change.data.MarksObtained
+                }));
+
+                if (changes.length > 0) {
+                    $.ajax({
+                        url: "/CoursesExams/SaveExamGrades",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(changes),
+                        success: function (response) {
+                            if (response.success) {
+                                DevExpress.ui.notify(response.message, "success", 3000);
+                            } else {
+                                DevExpress.ui.notify(response.message, "error", 3000);
+                                if (response.errors && response.errors.length > 0) {
+                                    console.error("Validation errors:", response.errors);
+                                }
+                            }
+                            e.component.refresh();
+                        },
+                        error: function (xhr) {
+                            let errorMessage = "Error saving grades. Please try again.";
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.responseText) {
+                                try {
+                                    const response = JSON.parse(xhr.responseText);
+                                    if (response.message) {
+                                        errorMessage = response.message;
+                                    }
+                                } catch (err) {
+                                    console.error("Error parsing server response:", err);
+                                }
+                            }
+                            DevExpress.ui.notify(errorMessage, "error", 3000);
+                        }
+                    });
+                }
+            },
+            paging: { pageSize: 100 },
+            searchPanel: {
+                visible: true,
+                highlightCaseSensitive: true
+            },
+            rtlEnabled: true,
+            showBorders: true,
+            columnAutoWidth: true,
+            rowAlternationEnabled: true,
+        });
+    });
+</script>
+
+<style>
+    .course-info-container {
+        background: #f1f4f7;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .course-info {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .course-item {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        padding: 5px 0;
+    }
+
+    .course-item i {
+        margin-right: 10px;
+        color: #007bff;
+        font-size: 18px;
+    }
+
+    .course-item span {
+        color: #007bff;
+    }
+
+    @@media (max-width: 768px) {
+        .course-info
+        {
+            flex-direction: column;
+        }
+
+        .course-item {
+            font-size: 14px;
+        }
+    }
+</style>
