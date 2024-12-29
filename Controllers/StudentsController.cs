@@ -44,6 +44,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadStudents()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var students = await _studentsService.GetAllStudents();
             return Json(students);
         }
@@ -51,6 +54,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadStudentprofile()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var students = await _studentsService.GetStudentById(Convert.ToInt32(userId));
             return Json(students);
@@ -59,6 +65,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetStudentById(int studentId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var student = await _studentsService.GetStudentById(studentId);
 
             if (student == null)
@@ -70,6 +79,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddStudent([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var values = formData["values"];
             var newStudent = new StudentsModel();
             JsonConvert.PopulateObject(values, newStudent);
@@ -88,6 +100,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateStudent([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var studentId = Convert.ToInt32(formData["key"]);
             var values = formData["values"];
             var student = await _studentsService.GetStudentById(studentId);
@@ -114,10 +129,13 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateProfile([FromBody] StudentsModel student)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId =Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
             if(userId != student.students_ID)
-                return BadRequest(new { ErrorMessage = "You cannot edit profile data other than your own." });
+                return BadRequest(new { ErrorMessage = "Flag{IntrusionIllusionTeamStudentUpdateProfileFlag}" });
 
             if (student == null)
                 return BadRequest(new { ErrorMessage = "Invalid data" });
@@ -149,6 +167,9 @@ namespace IbnSinaSystem.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteStudent([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var studentId = Convert.ToInt32(formData["key"]);
 
             bool deleteResult = await _studentsService.DeleteStudent(studentId);
@@ -162,6 +183,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllMessages()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             try
             {
                 var messages = await _studentsService.GetAllMessagesAsync();

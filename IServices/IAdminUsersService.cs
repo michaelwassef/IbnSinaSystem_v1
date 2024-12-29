@@ -9,5 +9,10 @@ namespace IbnSinaSystem.IServices
         Task<bool> InsertAdminUser(AdminUsersModel adminUser);
         Task<bool> UpdateAdminUser(AdminUsersModel adminUser);
         Task<bool> DeleteAdminUser(int adminUserId);
+
+        Task<int> GetTotalStudentsAsync();
+        Task<int> GetTotalProfessorsAsync();
+        Task<int> GetTotalCoursesAsync();
+        Task<IEnumerable<DBAdminUsersModel>> GetStudentsCountByCourse();
     }
 }

@@ -5,8 +5,142 @@
 
 <div class="page-title">
     <h1>
-        <i class="fas fa-users"></i>
+        <i class="fas fa-tachometer-alt"></i>
         Admin Dashboard
     </h1>
 </div>
 
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="dashboard-card bg-primary text-white">
+                <div class="card-content">
+                    <i class="fas fa-user-graduate card-icon"></i>
+                    <h3 id="studentsCount">0</h3>
+                    <p>Total Students</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card bg-success text-white">
+                <div class="card-content">
+                    <i class="fas fa-chalkboard-teacher card-icon"></i>
+                    <h3 id="professorsCount">0</h3>
+                    <p>Total Professors</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card bg-info text-white">
+                <div class="card-content">
+                    <i class="fas fa-book card-icon"></i>
+                    <h3 id="coursesCount">0</h3>
+                    <p>Total Courses</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Number of Students Per Course</h3>
+    <div id="studentsPerCourseChart" style="height: 400px;"></div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Admins/GetAdminDashboardCounts',
+                type: 'GET',
+                success: function (data) {
+                    $("#studentsCount").text(data.StudentsCount);
+                    $("#professorsCount").text(data.ProfessorsCount);
+                    $("#coursesCount").text(data.CoursesCount);
+                },
+                error: function () {
+                    DevExpress.ui.notify("Failed to load dashboard data.", "error", 3000);
+                }
+            });
+
+            $.ajax({
+                url: '/Admins/GetStudentsCountByCourse',
+                type: 'GET',
+                success: function (data) {
+                    renderStudentsPerCourseChart(data);
+                },
+                error: function () {
+                    DevExpress.ui.notify("Failed to load chart data.", "error", 3000);
+                }
+            });
+
+            function renderStudentsPerCourseChart(data) {
+                $("#studentsPerCourseChart").dxChart({
+                    dataSource: data,
+                    series: {
+                        argumentField: "CourseName",
+                        valueField: "StudentsCount",
+                        type: "bar"
+                    },
+                    customizePoint: function (pointInfo) {
+                        var colors = ["#FF5733", "#33FF57", "#3357FF", "#F1C40F", "#9B59B6", "#2ECC71", "#E74C3C", "#3498DB"];
+                        return {
+                            color: colors[pointInfo.index % colors.length]
+                        };
+                    },
+                    argumentAxis: {
+                        label: {
+                            overlappingBehavior: "rotate",
+                            rotationAngle: -45,
+                            font: {
+                                weight: 700,
+                                color: "#000"
+                            }
+                        }
+                    },
+                    export: { enabled: true },
+                    legend: { visible: false },
+                    tooltip: {
+                        enabled: true,
+                        customizeTooltip: function (arg) {
+                            return {
+                                text: `${arg.argumentText}: ${arg.valueText} Students`
+                            };
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+<style>
+    .dashboard-card {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        padding: 20px;
+        transition: transform 0.3s ease;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .card-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .card-content h3 {
+        margin: 0;
+        font-size: 32px;
+    }
+
+    .card-content p {
+        font-size: 16px;
+        margin: 0;
+    }
+</style>

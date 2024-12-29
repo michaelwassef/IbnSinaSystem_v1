@@ -30,6 +30,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadExamsByCourse(int courseId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             var exams = await _examsService.GetAllCoursesExamsDetailsByCourse(courseId);
             return Json(exams);
         }
@@ -37,6 +40,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddExam([FromBody] CoursesExamsDetailsModel newExam)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             if (newExam == null)
             {
                 return BadRequest(new { ErrorMessage = "Invalid data sent" });
@@ -66,6 +72,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateExam([FromBody] CoursesExamsDetailsModel updatedExam)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             if (updatedExam == null || updatedExam.coursesexamsdetails_ID <= 0)
             {
                 return BadRequest(new { ErrorMessage = "Invalid exam data or missing ID." });
@@ -107,6 +116,9 @@ namespace IbnSinaSystem.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteExam([FromBody] CoursesExamsDetailsModel model)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             if (model.coursesexamsdetails_ID <= 0)
             {
                 return BadRequest(new { ErrorMessage = "Invalid exam ID provided." });
@@ -139,6 +151,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewStudentsData(int courseId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             try
             {
                 var students = await _coursesDetailsService.GetAllMarksStudentsByCourseID(courseId);
@@ -153,6 +168,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveExamGrades([FromBody] List<CoursesExamsMarksModel> grades)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             if (grades == null || grades.Count == 0) { return BadRequest(new { success = false, message = "No grades provided." }); }
 
             var errors = new List<string>();

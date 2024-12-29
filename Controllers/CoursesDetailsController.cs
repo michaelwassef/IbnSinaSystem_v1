@@ -57,6 +57,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadCourseDetails()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var courseDetails = await _coursesDetailsService.GetAllCourseDetails();
             return Json(courseDetails);
         }
@@ -64,6 +67,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCourseDetailById(int id)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var courseDetail = await _coursesDetailsService.GetCourseDetailById(id);
 
             if (courseDetail == null)
@@ -75,6 +81,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCourseDetail([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var values = formData["values"];
             var newCourseDetail = new CoursesDetailsModel();
             JsonConvert.PopulateObject(values, newCourseDetail);
@@ -91,6 +100,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateCourseDetail([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var courseDetailId = Convert.ToInt32(formData["key"]);
             var values = formData["values"];
             var courseDetail = await _coursesDetailsService.GetCourseDetailById(courseDetailId);
@@ -111,6 +123,9 @@ namespace IbnSinaSystem.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteCourseDetail([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var courseDetailId = Convert.ToInt32(formData["key"]);
 
             bool deleteResult = await _coursesDetailsService.DeleteCourseDetail(courseDetailId);
@@ -124,6 +139,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadStudentsCourses()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var courses = await _coursesDetailsService.GetAllCoursesByStudentID(Convert.ToInt32(userId));
             return Json(courses);
@@ -132,6 +150,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadAvailableCourses()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
             var student = await _studentsService.GetStudentById(userId);
             var courseDetails = await _coursesDetailsService.GetAllAvailableCourseDetails(userId, student.students_SemesterIN, student.students_departments_ID);
@@ -141,6 +162,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCourse([FromBody] int courseId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
             var isAdded = await _studentsService.IsCourseAddedAsync(userId, courseId);
@@ -166,6 +190,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveCourse([FromBody] int courseId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
             var isAdded = await _studentsService.IsCourseAddedAsync(userId, courseId);
@@ -186,6 +213,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadStudentGrades()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
             var grades = await _coursesDetailsService.GetStudentGradesAsync(userId);
             return Json(grades);
@@ -194,6 +224,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadLectureGrid()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Student") { return BadRequest("You Don't Have Permission To Access"); }
+
             try
             {
                 var userId = Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
@@ -216,6 +249,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadProfessorCourses()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var courses = await _coursesDetailsService.GetAllCourseDetailsByProfessorsID(Convert.ToInt32(userId));
             return Json(courses);
@@ -236,6 +272,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewStudentsData(int courseId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             try
             {
                 var students = await _coursesDetailsService.GetAllStudentsByCourseID(courseId);

@@ -3,7 +3,6 @@ using IbnSinaSystem.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Security.Claims;
 
 namespace IbnSinaSystem.Controllers
@@ -121,6 +120,19 @@ namespace IbnSinaSystem.Controllers
         {
             try
             {
+                if (newStudent.students_Password.Length < 8)
+                {
+                    return BadRequest(new { ErrorMessage = "Password must be at least 8 characters long", success = false });
+                }
+
+                bool usernameExistsInStudents = await _studentsService.CheckUsernameExistsInStudents(newStudent.students_username);
+                bool usernameExistsInProfessors = await _studentsService.CheckUsernameExistsInProfessors(newStudent.students_username);
+                bool usernameExistsInAdmins = await _studentsService.CheckUsernameExistsInAdmins(newStudent.students_username);
+                if (usernameExistsInStudents || usernameExistsInProfessors || usernameExistsInAdmins)
+                {
+                    return BadRequest(new { ErrorMessage = "Username is already taken", success = false });
+                }
+
                 newStudent.students_Password = PasswordHasher.HashPassword(newStudent.students_Password);
                 newStudent.students_SemesterIN = 1;
                 newStudent.students_GPA = 0;

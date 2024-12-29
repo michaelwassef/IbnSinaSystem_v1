@@ -1,6 +1,5 @@
 ﻿using IbnSinaSystem.IServices;
 using IbnSinaSystem.Models;
-using IbnSinaSystem.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -42,10 +41,13 @@ namespace IbnSinaSystem.Controllers
             return View();
         }
 
-       
+
         [HttpGet]
         public async Task<IActionResult> LoadProfessors()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var professors = await _professorsService.GetAllProfessors();
             return Json(professors);
         }
@@ -53,6 +55,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadProfessorprofile()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var professor = await _professorsService.GetProfessorById(Convert.ToInt32(userId));
             return Json(professor);
@@ -61,6 +66,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProfessorById(int professorId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             var professor = await _professorsService.GetProfessorById(professorId);
 
             if (professor == null)
@@ -72,6 +80,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddProfessor([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var values = formData["values"];
             var newProfessor = new ProfessorsModel();
             JsonConvert.PopulateObject(values, newProfessor);
@@ -82,7 +93,7 @@ namespace IbnSinaSystem.Controllers
                 newProfessor.professors_Password = PasswordHasher.HashPassword(newProfessor.professors_Password);
             }
 
-            newProfessor.professors_ID = await _professorsService.GetMaxprofessorsID()+1;
+            newProfessor.professors_ID = await _professorsService.GetMaxprofessorsID() + 1;
             bool addResult = await _professorsService.InsertProfessor(newProfessor);
 
             if (addResult)
@@ -94,6 +105,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateProfessor([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var professorId = Convert.ToInt32(formData["key"]);
             var values = formData["values"];
             var professor = await _professorsService.GetProfessorById(professorId);
@@ -120,6 +134,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateProfile([FromBody] ProfessorsModel prof)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Professor") { return BadRequest("You Don't Have Permission To Access"); }
+
             var userId = Convert.ToInt32(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
             if (userId != prof.professors_ID)
@@ -154,6 +171,9 @@ namespace IbnSinaSystem.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteProfessor([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var professorId = Convert.ToInt32(formData["key"]);
 
             bool deleteResult = await _professorsService.DeleteProfessor(professorId);

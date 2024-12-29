@@ -21,25 +21,25 @@
             <div class="card login-card">
                 <div class="row no-gutters">
                     <div class="col-md-6">
-                        <img src="/logo3.jpg" alt="login" class="login-card-img">
+                        <img src="/logo3.png" alt="login" class="login-card-img">
                     </div>
                     <div class="col-md-6">
                         <div class="card-body">
-                            <p class="login-card-description" style="font-size:30px;">تسجيل الدخول</p>
+                            <p class="login-card-description" style="font-size:30px;">Login</p>
                             <form asp-controller="Access" asp-action="Login" method="post">
                                 <div class="form-group">
                                     <i class="mdi mdi-account form-icon"></i>
-                                    <input type="text" class="form-control" name="UserName" asp-for="UserName" placeholder="اسم الدخول" required>
+                                    <input type="text" class="form-control" name="UserName" asp-for="UserName" placeholder="Username" required>
                                 </div>
                                 <div class="form-group">
                                     <i class="mdi mdi-lock form-icon"></i>
-                                    <input type="password" class="form-control" name="Password" asp-for="Password" placeholder="كلمة المرور" required>
+                                    <input type="password" class="form-control" name="Password" asp-for="Password" placeholder="Password" required>
                                 </div>
                                 <div class="text-center">
-                                    <button class="btn btn-block login-btn mb-4" type="submit">دخول</button>
+                                    <button class="btn btn-block login-btn mb-4" type="submit">Login</button>
                                 </div>
                                 <div class="text-center">
-                                    <a href="/Access/SignUp" class="btn btn-link">تسجيل حساب جديد</a>
+                                    <a href="/Access/SignUp" class="btn btn-link">Create a New Account</a>
                                 </div>
                             </form>
                             @if (TempData["ValidateMessage"] != null)

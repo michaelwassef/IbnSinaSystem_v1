@@ -27,6 +27,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadDepartments()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var departments = await _departmentsService.GetAllDepartments();
             return Json(departments);
         }
@@ -34,6 +37,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddDepartment([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var values = formData["values"];
             var newDepartment = new DepartmentsModel();
             JsonConvert.PopulateObject(values, newDepartment);
@@ -49,6 +55,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateDepartment([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var departmentId = Convert.ToInt32(formData["key"]);
             var values = formData["values"];
             var department = await _departmentsService.SelectdepartmentByID(departmentId);
@@ -69,6 +78,9 @@ namespace IbnSinaSystem.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteDepartment([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var departmentId = Convert.ToInt32(formData["key"]);
 
             bool deleteResult = await _departmentsService.Deletedepartment(departmentId);

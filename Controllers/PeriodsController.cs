@@ -27,6 +27,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadPeriods()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var periods = await _periodsService.GetAllPeriods();
             return Json(periods);
         }
@@ -34,6 +37,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPeriod([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var values = formData["values"];
             var newPeriod = new PeriodsModel();
             JsonConvert.PopulateObject(values, newPeriod);
@@ -49,6 +55,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdatePeriod([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var periodId = Convert.ToInt32(formData["key"]);
             var values = formData["values"];
             var period = await _periodsService.SelectPeriodByID(periodId);
@@ -69,6 +78,9 @@ namespace IbnSinaSystem.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeletePeriod([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var periodId = Convert.ToInt32(formData["key"]);
 
             bool deleteResult = await _periodsService.DeletePeriod(periodId);

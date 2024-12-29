@@ -18,5 +18,9 @@ namespace IbnSinaSystem.IServices
 
         Task<IEnumerable<ContactFormModel>> GetAllMessagesAsync();
         Task<bool> SaveContactFormAsync(ContactFormModel model);
+
+        Task<bool> CheckUsernameExistsInStudents(string username);
+        Task<bool> CheckUsernameExistsInProfessors(string username);
+        Task<bool> CheckUsernameExistsInAdmins(string username);
     }
 }

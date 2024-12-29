@@ -131,5 +131,26 @@ namespace IbnSinaSystem.Services
 
             return result > 0;
         }
+
+        public async Task<bool> CheckUsernameExistsInStudents(string username)
+        {
+            string query = "SELECT COUNT(1) FROM Students WHERE students_Username = @Username";
+            int count = await _db.ExecuteScalarAsync<int>(query, new { Username = username });
+            return count > 0;
+        }
+
+        public async Task<bool> CheckUsernameExistsInProfessors(string username)
+        {
+            string query = "SELECT COUNT(1) FROM Professors WHERE professors_Username = @Username";
+            int count = await _db.ExecuteScalarAsync<int>(query, new { Username = username });
+            return count > 0;
+        }
+
+        public async Task<bool> CheckUsernameExistsInAdmins(string username)
+        {
+            string query = "SELECT COUNT(1) FROM AdminUsers WHERE adminusers_Username = @Username";
+            int count = await _db.ExecuteScalarAsync<int>(query, new { Username = username });
+            return count > 0;
+        }
     }
 }

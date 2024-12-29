@@ -25,24 +25,24 @@
                     </div>
                     <div class="col-md-6">
                         <div class="card-body">
-                            <p class="login-card-description" style="font-size:30px;">تسجيل طالب جديد</p>
+                            <p class="login-card-description" style="font-size:30px;">Register New Student</p>
                             <form id="signupForm" method="post" action="/Access/SignUp">
                                 <div class="form-group">
                                     <i class="mdi mdi-account form-icon"></i>
-                                    <input type="text" id="students_Name" name="students_Name" class="form-control" placeholder="الاسم الكامل" required />
+                                    <input type="text" id="students_Name" name="students_Name" class="form-control" placeholder="Full Name" required />
                                 </div>
                                 <div class="form-group">
                                     <i class="mdi mdi-phone form-icon"></i>
-                                    <input type="text" id="students_PhoneNumber" name="students_PhoneNumber" class="form-control" placeholder="رقم الهاتف" />
+                                    <input type="text" id="students_PhoneNumber" name="students_PhoneNumber" class="form-control" placeholder="Phone Number" />
                                 </div>
                                 <div class="form-group">
                                     <i class="mdi mdi-calendar form-icon"></i>
-                                    <input type="date" id="students_BirthDay" name="students_BirthDay" class="form-control" placeholder="تاريخ الميلاد" required />
+                                    <input type="date" id="students_BirthDay" name="students_BirthDay" class="form-control" placeholder="Date of Birth" required />
                                 </div>
                                 <div class="form-group">
                                     <i class="mdi mdi-domain form-icon"></i>
                                     <select id="students_departments_ID" name="students_departments_ID" class="form-control" required>
-                                        <option value="">-- اختر القسم --</option>
+                                        <option value="">-- Choose Department --</option>
                                         @foreach (var department in ViewBag.Departments)
                                         {
                                             <option value="@department.departments_ID">@department.departments_Name</option>
@@ -51,17 +51,17 @@
                                 </div>
                                 <div class="form-group">
                                     <i class="mdi mdi-account-box form-icon"></i>
-                                    <input type="text" id="students_username" name="students_username" class="form-control" placeholder="اسم المستخدم" required />
+                                    <input type="text" id="students_username" name="students_username" class="form-control" placeholder="Username" required />
                                 </div>
                                 <div class="form-group">
                                     <i class="mdi mdi-lock form-icon"></i>
-                                    <input type="password" id="students_Password" name="students_Password" class="form-control" placeholder="كلمة المرور" required />
+                                    <input type="password" id="students_Password" name="students_Password" class="form-control" placeholder="Password" required />
                                 </div>
                                 <div class="text-center">
-                                    <button class="btn btn-block login-btn mb-4" type="submit">تسجيل</button>
+                                    <button class="btn btn-block login-btn mb-4" type="submit">Register</button>
                                 </div>
                                 <div class="text-center">
-                                    <a href="/Access/Login" class="btn btn-link">لديك حساب بالفعل؟ تسجيل الدخول</a>
+                                    <a href="/Access/Login" class="btn btn-link">Already have an account? Login</a>
                                 </div>
                             </form>
                         </div>

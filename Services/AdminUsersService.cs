@@ -53,5 +53,36 @@ namespace IbnSinaSystem.Services
             int rowsAffected = await _db.ExecuteAsync(query, new { Id = adminUserId });
             return rowsAffected > 0;
         }
+
+        public async Task<int> GetTotalStudentsAsync()
+        {
+            string query = "SELECT COUNT(*) FROM Students";
+            return await _db.ExecuteScalarAsync<int>(query);
+        }
+
+        public async Task<int> GetTotalProfessorsAsync()
+        {
+            string query = "SELECT COUNT(*) FROM Professors";
+            return await _db.ExecuteScalarAsync<int>(query);
+        }
+
+        public async Task<int> GetTotalCoursesAsync()
+        {
+            string query = "SELECT COUNT(*) FROM CoursesDetails";
+            return await _db.ExecuteScalarAsync<int>(query);
+        }
+
+        public async Task<IEnumerable<DBAdminUsersModel>> GetStudentsCountByCourse()
+        {
+            string query = @"
+                SELECT c.courses_Name AS CourseName, COUNT(sc.students_ID) AS StudentsCount
+                FROM StudentCourses sc
+                LEFT JOIN CoursesDetails cd ON sc.coursesdetails_ID = cd.coursesdetails_ID
+                LEFT JOIN Courses c ON cd.coursesdetails_courses_ID = c.courses_ID
+                GROUP BY c.courses_Name";
+
+            return await _db.QueryAsync<DBAdminUsersModel>(query);
+        }
+
     }
 }

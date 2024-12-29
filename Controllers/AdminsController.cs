@@ -41,6 +41,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> LoadAdminUsers()
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var adminUsers = await _adminUsersService.GetAllAdminUsers();
             return Json(adminUsers);
         }
@@ -48,6 +51,9 @@ namespace IbnSinaSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAdminUserById(int adminUserId)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var adminUser = await _adminUsersService.GetAdminUserById(adminUserId);
 
             if (adminUser == null)
@@ -59,6 +65,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddAdminUser([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var values = formData["values"];
             var newAdminUser = new AdminUsersModel();
             JsonConvert.PopulateObject(values, newAdminUser);
@@ -79,6 +88,9 @@ namespace IbnSinaSystem.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateAdminUser([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var adminUserId = Convert.ToInt32(formData["key"]);
             var values = formData["values"];
             var adminUser = await _adminUsersService.GetAdminUserById(adminUserId);
@@ -104,6 +116,9 @@ namespace IbnSinaSystem.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteAdminUser([FromForm] IFormCollection formData)
         {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
             var adminUserId = Convert.ToInt32(formData["key"]);
 
             bool deleteResult = await _adminUsersService.DeleteAdminUser(adminUserId);
@@ -113,5 +128,32 @@ namespace IbnSinaSystem.Controllers
             else
                 return BadRequest(new { ErrorMessage = "Error occurred while deleting the admin user" });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAdminDashboardCounts()
+        {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
+            var counts = new
+            {
+                StudentsCount = await _adminUsersService.GetTotalStudentsAsync(),
+                ProfessorsCount = await _adminUsersService.GetTotalProfessorsAsync(),
+                CoursesCount = await _adminUsersService.GetTotalCoursesAsync()
+            };
+
+            return Json(counts);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetStudentsCountByCourse()
+        {
+            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (userRole != "Admin") { return BadRequest("You Don't Have Permission To Access"); }
+
+            var data = await _adminUsersService.GetStudentsCountByCourse();
+            return Json(data);
+        }
+
     }
 }
